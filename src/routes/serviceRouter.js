@@ -3,10 +3,11 @@ const serviceRouter = Router();
 const { Service, Master } = require('../models');
 const { isValidObjectId } = require('mongoose');
 const mongoose = require('mongoose');
+const { protect } = require('../middleware/auth');
 
 // serviceRouter.use('/:blogId/comment', commentRouter);
 
-serviceRouter.post('/', async (req, res) => {
+serviceRouter.post('/', protect, async (req, res) => {
   try {
     const {
       sv_category,
@@ -93,7 +94,7 @@ serviceRouter.post('/', async (req, res) => {
   }
 });
 
-serviceRouter.get('/', async (req, res) => {
+serviceRouter.get('/', protect, async (req, res) => {
   try {
     const services = await Service.find({}).limit(10);
     return res.send({ services });
@@ -103,7 +104,7 @@ serviceRouter.get('/', async (req, res) => {
   }
 });
 
-serviceRouter.get('/:serviceId', async (req, res) => {
+serviceRouter.get('/:serviceId', protect, async (req, res) => {
   try {
     const { serviceId } = req.params;
 
@@ -119,7 +120,7 @@ serviceRouter.get('/:serviceId', async (req, res) => {
 });
 
 // 블로그 게시글 전체수정
-serviceRouter.put('/:serviceId', async (req, res) => {
+serviceRouter.put('/:serviceId', protect, async (req, res) => {
   try {
     const { serviceId } = req.params;
 
@@ -164,7 +165,7 @@ serviceRouter.put('/:serviceId', async (req, res) => {
 });
 
 // sv_detail 부분수정
-serviceRouter.patch('/:serviceId', async (req, res) => {
+serviceRouter.patch('/:serviceId', protect, async (req, res) => {
   try {
     const { serviceId } = req.params;
     const { sv_detail } = req.body;
@@ -184,7 +185,7 @@ serviceRouter.patch('/:serviceId', async (req, res) => {
   }
 });
 
-serviceRouter.delete('/:serviceId', async (req, res) => {
+serviceRouter.delete('/:serviceId', protect, async (req, res) => {
   try {
     const { serviceId } = req.params;
     if (!mongoose.isValidObjectId(serviceId))

@@ -2,11 +2,12 @@ const { Router } = require('express');
 const reviewRouter = Router({ mergeParams: true });
 const { Review, Service, User } = require('../models');
 const { isValidObjectId } = require('mongoose');
+const { protect } = require('../middleware/auth');
 
 // blog/:blogId/comment/:commentId
 // Router({mergeParams:true}) =>중간에 blogId를 가져올수 있다.
 
-reviewRouter.post('/', async (req, res) => {
+reviewRouter.post('/', protect, async (req, res) => {
   try {
     const { serviceId } = req.params;
     const { content, userId } = req.body;
@@ -40,7 +41,7 @@ reviewRouter.post('/', async (req, res) => {
   }
 });
 
-reviewRouter.get('/', async (req, res) => {
+reviewRouter.get('/', protect, async (req, res) => {
   const { serviceId } = req.params;
 
   if (!isValidObjectId(serviceId))
