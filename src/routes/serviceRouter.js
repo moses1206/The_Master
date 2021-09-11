@@ -94,7 +94,7 @@ serviceRouter.post('/', protect, async (req, res) => {
   }
 });
 
-serviceRouter.get('/', protect, async (req, res) => {
+serviceRouter.get('/', async (req, res) => {
   try {
     const services = await Service.find({}).limit(10);
     return res.send({ services });

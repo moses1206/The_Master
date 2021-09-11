@@ -1,38 +1,31 @@
 const jwt = require('jsonwebtoken');
-const asyncHandler = require('./async');
 const config = require('../config/key');
-const ErrorResponse = require('../utils/errorResponse');
-const User = require('../models/User');
+const { User } = require('../models/User');
+const asyncHandler = require('express-async-handler');
 
 // Protect routes
-exports.protect = asyncHandler(async (req, res, next) => {
+const protect = asyncHandler(async (req, res, next) => {
   let token;
 
   if (
     req.headers.authorization &&
     req.headers.authorization.startsWith('Bearer')
   ) {
-    // Set token from Bearer token in header
-    token = req.headers.authorization.split(' ')[1];
-    // Set token from cookie
-  }
-  // else if (req.cookies.token) {
-  //   token = req.cookies.token;
-  // }
+    try {
+      token = req.headers.authorization.split(' ')[1];
+      const decoded = jwt.verify(token, config.jwtSecret);
 
-  // Make sure token exists
+      req.user = await User.findById(decoded.id);
+
+      next();
+    } catch (err) {
+      console.error(err);
+      return res.status(401).send('인증에 실패하였습니다.!!');
+    }
+  }
   if (!token) {
-    return next(new ErrorResponse('Not authorized to access this route1', 401));
-  }
-
-  try {
-    // Verify token
-    const decoded = jwt.verify(token, config.jwtSecret);
-
-    req.user = await User.findById(decoded.id);
-
-    next();
-  } catch (err) {
-    return next(new ErrorResponse('Not authorized to access this route2', 401));
+    return res.status(400).send('토큰이 필요합니다.!!');
   }
 });
+
+module.exports = { protect };

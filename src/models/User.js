@@ -7,11 +7,11 @@ const UserSchema = new Schema(
   {
     username: {
       type: String,
-      require: [true, 'Please add a username'],
+      require: true,
     },
     email: {
       type: String,
-      required: [true, 'Please add an email'],
+      required: true,
       unique: true,
       match: [
         /^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/,
@@ -20,12 +20,10 @@ const UserSchema = new Schema(
     },
     password: {
       type: String,
-      require: [true, 'Please add a password'],
+      required: true,
       minlength: 6,
       select: false,
     },
-    resetPasswordToken: String,
-    resetPasswordExpire: Date,
     role: {
       type: String,
       enum: ['user', 'admin'],
@@ -38,6 +36,10 @@ const UserSchema = new Schema(
 
 // Encrypt password using bcrypt
 UserSchema.pre('save', async function (next) {
+  if (!this.isModified('password')) {
+    next();
+  }
+
   const salt = await bcrypt.genSalt(10);
   this.password = await bcrypt.hash(this.password, salt);
 });
